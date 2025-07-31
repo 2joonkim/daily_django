@@ -125,4 +125,30 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/cbv/todo'
-LOGOUT_REDIRECT_URL = 'cbv/todo/'
+LOGOUT_REDIRECT_URL = '/cbv/todo/'
+
+# 개발 환경에서 에러 메시지 더 잘 보이게 하기
+if DEBUG:
+    # 콘솔에 SQL 쿼리 로그 출력
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',
+            },
+            'django.db.backends': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            },
+        },
+    }
+    
+    # 템플릿 에러 더 자세히 보기
+    TEMPLATES[0]['OPTIONS']['debug'] = True

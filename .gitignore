@@ -4,3 +4,6 @@
 #Vscode
 __pycache__/
 *.py[cod]
+.venv
+.Vscode/
+.vscode/
