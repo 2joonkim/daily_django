@@ -26,6 +26,7 @@ class TodoListView(LoginRequiredMixin, ListView):
 class TodoDetailView(LoginRequiredMixin, DetailView):
     model = Todo
     template_name = 'todo/todo_info.html'
+    paginate_by = 10
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
@@ -35,7 +36,30 @@ class TodoDetailView(LoginRequiredMixin, DetailView):
         return obj
 
     def get_context_data(self, **kwargs):
-        context = {'todo': self.object.__dict__}
+        context = super().get_context_data(**kwargs)
+        
+        # 댓글 목록 가져오기 (페이지네이션 적용)
+        from django.core.paginator import Paginator
+        from django import forms
+        
+        comments = self.object.comments.all().order_by('-created_at')
+        paginator = Paginator(comments, self.paginate_by)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        # 댓글 폼 생성
+        class CommentForm(forms.Form):
+            message = forms.CharField(
+                widget=forms.Textarea(attrs={
+                    'class': 'form-control',
+                    'rows': 3,
+                    'placeholder': '댓글을 입력하세요...'
+                })
+            )
+        
+        context['comment_form'] = CommentForm()
+        context['page_obj'] = page_obj
+        
         return context
 
 
@@ -84,32 +108,27 @@ class TodoDeleteView(LoginRequiredMixin, DeleteView):
         return reverse_lazy('cbv_todo_list')
 
 
-class TodoDetialView(LoginRequiredMixin, DeleteView):
-    model = Todo
-    queryset = Todo.objects.all().prefetch_related('comments', 'comments_user')
-    template_name = 'todo/todo_info.html'
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-
-        if obj.user != self.request.user and not self.request.user.is_superuser:
-            raise Http404("해당 To Do를 조회할 권한이 없습니다.")
-        return obj
+# 중복된 클래스 제거됨
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     fields = ['message']
-    pk_url_kwarg = 'todo_id'
-
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.user = self.request.user
-        self.object.todo = Todo.objects.get(id=self.kwargs['todo_id'])
-        self.object.save()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse_lazy('cbv_todo_info', kwargs={'pk': self.kwargs[todo.id]})
+    
+    def post(self, request, *args, **kwargs):
+        todo = Todo.objects.get(id=self.kwargs['todo_id'])
+        comment = Comment(
+            message=request.POST.get('message'),
+            user=request.user,
+            todo=todo
+        )
+        comment.save()
+        return HttpResponseRedirect(reverse_lazy('cbv_todo_info', kwargs={'pk': todo.id}))
+    
+    def get(self, request, *args, **kwargs):
+        # GET 요청은 todo 상세 페이지로 리다이렉트
+        todo_id = self.kwargs['todo_id']
+        return HttpResponseRedirect(reverse_lazy('cbv_todo_info', kwargs={'pk': todo_id}))
 
 
 class CommentUpdateView(LoginRequiredMixin, UpdateView):

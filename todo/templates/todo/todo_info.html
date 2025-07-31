@@ -129,7 +129,7 @@
                             {% if request.user == comment.user or request.user.is_staff %}
                             <div class="btn-group btn-group-sm">
                                 <button class="btn btn-outline-primary" type="button"
-                                    onclick="toggleModifyForm({{ comment.id }})">
+                                    onclick="toggleModifyForm('{{ comment.id }}')">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <form method="POST" action="{% url 'comment_delete' comment.id %}"
@@ -158,7 +158,7 @@
                                 <i class="bi bi-check me-1"></i>수정 완료
                             </button>
                             <button type="button" class="btn btn-secondary btn-sm"
-                                onclick="toggleModifyForm({{ comment.id }})">
+                                onclick="toggleModifyForm('{{ comment.id }}')">
                                 <i class="bi bi-x me-1"></i>취소
                             </button>
                         </form>
@@ -201,8 +201,8 @@
 
 <script>
     function toggleModifyForm(commentId) {
-        const modifyForm = document.getElementById(`comment_modify_form_${commentId}`);
-        const content = document.getElementById(`comment_content_${commentId}`);
+        const modifyForm = document.getElementById('comment_modify_form_' + commentId);
+        const content = document.getElementById('comment_content_' + commentId);
 
         if (modifyForm.style.display === "none" || modifyForm.style.display === "") {
             modifyForm.style.display = "block";

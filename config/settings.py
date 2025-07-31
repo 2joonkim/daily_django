@@ -129,7 +129,7 @@ LOGOUT_REDIRECT_URL = '/cbv/todo/'
 
 # 개발 환경에서 에러 메시지 더 잘 보이게 하기
 if DEBUG:
-    # 콘솔에 SQL 쿼리 로그 출력
+    # 개발 환경에서 깔끔한 로그 출력
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -138,14 +138,14 @@ if DEBUG:
                 'class': 'logging.StreamHandler',
             },
         },
+        'root': {
+            'level': 'INFO',
+        },
         'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': 'INFO',
-            },
             'django.db.backends': {
+                'level': 'WARNING',  # SQL 쿼리 숨기기
                 'handlers': ['console'],
-                'level': 'DEBUG',
+                'propagate': False,
             },
         },
     }
