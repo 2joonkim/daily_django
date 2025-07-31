@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from todo.views import todo_list, todo_info, todo_create, todo_update, todo_delete
 from users import views as user_views
 
@@ -30,4 +32,9 @@ urlpatterns = [
     path('accounts/login/', user_views.login, name='login'),
     path('accounts/signup/', user_views.sign_up, name='signup'),
     path('cbv/', include('todo.urls')),
+    path('summernote/', include('django_summernote.urls'))
 ]
+
+# 개발 환경에서 미디어 파일 서빙
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

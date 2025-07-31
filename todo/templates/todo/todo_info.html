@@ -73,10 +73,26 @@
                     </div>
                 </div>
                 <hr>
+                
+                <!-- 이미지 섹션 -->
+                {% if todo.thumbnail %}
+                <div class="mb-4">
+                    <label class="text-muted small">첨부 이미지</label>
+                    <div class="mt-2 text-center">
+                        <img src="{{ todo.thumbnail.url }}" alt="{{ todo.title }}" class="img-fluid rounded shadow-sm" style="max-width: 100%; max-height: 400px;">
+                    </div>
+                </div>
+                <hr>
+                {% endif %}
+                
                 <div>
                     <label class="text-muted small">상세 설명</label>
                     <div class="mt-2 p-3 bg-light rounded">
-                        {{ todo.description|linebreaks|default:"설명이 없습니다." }}
+                        {% if todo.description %}
+                            {{ todo.description|safe }}
+                        {% else %}
+                            <span class="text-muted">설명이 없습니다.</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
