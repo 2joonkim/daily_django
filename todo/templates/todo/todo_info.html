@@ -1,85 +1,232 @@
 {% extends 'todo/base.html' %}
 {% block content %}
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 20px;
-    }
-    .container {
-        max-width: 600px;
-        margin: auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-        text-align: center;
-        color: #333;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th, td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-    th {
-        background: #f0f0f0;
-    }
-    a {
-        text-decoration: none;
-        color: #333;
-    }
-    /* 버튼 스타일 */
-    .button-group {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        margin-top: 20px;
-        padding: 10px 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
+<div class="row">
+    <div class="col-12">
+        <!-- Back Button -->
+        <div class="mb-3">
+            <a href="{% url 'cbv_todo_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>목록으로 돌아가기
+            </a>
+        </div>
 
-    .button-group:hover {
-        background-color: #0056b3;
-    }
+        <!-- Todo 상세 정보 -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-1">
+                            <i class="bi bi-clipboard-check me-2"></i>{{ todo.title }}
+                        </h3>
+                        <small class="opacity-75">
+                            <i class="bi bi-person me-1"></i>{{ todo.user.username }} 작성
+                        </small>
+                    </div>
+                    <div>
+                        <a href="{% url 'cbv_todo_update' todo.id %}" class="btn btn-light btn-sm me-2">
+                            <i class="bi bi-pencil me-1"></i>수정
+                        </a>
+                        <form method="POST" action="{% url 'cbv_todo_delete' todo.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('정말 삭제하시겠습니까?')">
+                                <i class="bi bi-trash me-1"></i>삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">상태</label>
+                            <div>
+                                <span
+                                    class="badge fs-6 {% if todo.is_completed %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                    {% if todo.is_completed %}
+                                    <i class="bi bi-check-circle me-1"></i>완료
+                                    {% else %}
+                                    <i class="bi bi-clock me-1"></i>진행중
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">시작일</label>
+                            <div><i class="bi bi-calendar-event me-1"></i>{{ todo.start_date }}</div>
+                        </div>
+                        <div class="info-item">
+                            <label class="text-muted small">종료일</label>
+                            <div><i class="bi bi-calendar-x me-1"></i>{{ todo.end_date }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">생성일</label>
+                            <div><i class="bi bi-plus-circle me-1"></i>{{ todo.created_at|date:"Y년 m월 d일 H:i" }}</div>
+                        </div>
+                        <div class="info-item mb-3">
+                            <label class="text-muted small">수정일</label>
+                            <div><i class="bi bi-arrow-clockwise me-1"></i>{{ todo.modified_at|date:"Y년 m월 d일 H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                
+                <!-- 이미지 섹션 -->
+                {% if todo.thumbnail %}
+                <div class="mb-4">
+                    <label class="text-muted small">첨부 이미지</label>
+                    <div class="mt-2 text-center">
+                        <img src="{{ todo.thumbnail.url }}" alt="{{ todo.title }}" class="img-fluid rounded shadow-sm" style="max-width: 100%; max-height: 400px;">
+                    </div>
+                </div>
+                <hr>
+                {% endif %}
+                
+                <div>
+                    <label class="text-muted small">상세 설명</label>
+                    <div class="mt-2 p-3 bg-light rounded">
+                        {% if todo.description %}
+                            {{ todo.description|safe }}
+                        {% else %}
+                            <span class="text-muted">설명이 없습니다.</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    #delete-button {
-        background-color: #ff1122;
-    }
-    #delete-button:hover {
-        background-color: #cc1122;
-    }
-</style>
-<div class="container">
-    <div style="display: flex; justify-content: space-between">
-        <h1>{{ todo.title }}</h1>
-        <div style="display: flex;">
-            <button class="button-group" onclick="location.href='{% url 'cbv_todo_update' todo.id %}'">수정하기</button>
-            <form method="POST" action="{% url 'cbv_todo_delete' todo.id %}">
-                {% csrf_token %}
-                <button id="delete-button" type="submit" class="button-group">삭제하기</button>
-            </form>
+        <!-- 댓글 섹션 -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-chat-dots me-2"></i>댓글
+                    {% if page_obj %}
+                    <span class="badge bg-secondary">{{ page_obj.paginator.count }}</span>
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <!-- 댓글 작성 폼 -->
+                <div class="bg-light p-3 rounded mb-4">
+                    <form method="POST" action="{% url 'comment_create' todo.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">새 댓글 작성</label>
+                            {{ comment_form.message }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-1"></i>댓글 작성
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 댓글 목록 -->
+                <div id="comment_wrapper">
+                    {% if page_obj %}
+                    {% for comment in page_obj %}
+                    <div class="comment-item border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <div>
+                                    <strong>{{ comment.user.username }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>{{ comment.created_at|date:"Y-m-d H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% if request.user == comment.user or request.user.is_staff %}
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" type="button"
+                                    onclick="toggleModifyForm('{{ comment.id }}')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <form method="POST" action="{% url 'comment_delete' comment.id %}"
+                                    style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger"
+                                        onclick="return confirm('댓글을 삭제하시겠습니까?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div id="comment_content_{{ comment.id }}" class="ms-5">
+                            <p class="mb-0">{{ comment.message|linebreaks }}</p>
+                        </div>
+
+                        <form id="comment_modify_form_{{ comment.id }}" style="display: none;" method="POST"
+                            action="{% url 'comment_update' comment.id %}" class="ms-5 mt-3">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                {{ comment_form.message }}
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm me-2">
+                                <i class="bi bi-check me-1"></i>수정 완료
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                onclick="toggleModifyForm('{{ comment.id }}')">
+                                <i class="bi bi-x me-1"></i>취소
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-chat display-4 text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">댓글이 없습니다</h5>
+                        <p class="text-muted">첫 번째 댓글을 작성해보세요!</p>
+                    </div>
+                    {% endif %}
+
+                    {% if page_obj %}
+                    <div class="d-flex justify-content-center mt-4">
+                        {% include 'todo/pagination.html' with fragment='comment_wrapper' %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
-    </div>
-    <table>
-        {% for key, value in todo.items %}
-            {% if key != 'title' and key != 'id' and key != 'user_id' and key != '_state'%}
-                <tr>
-                    <th>{{ key }}</th>
-                    <td>{{ value }}</td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-    </table>
 </div>
-{% endblock %}
 
+<style>
+    .info-item label {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .comment-item:last-child {
+        border-bottom: none !important;
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+</style>
+
+<script>
+    function toggleModifyForm(commentId) {
+        const modifyForm = document.getElementById('comment_modify_form_' + commentId);
+        const content = document.getElementById('comment_content_' + commentId);
+
+        if (modifyForm.style.display === "none" || modifyForm.style.display === "") {
+            modifyForm.style.display = "block";
+            content.style.display = "none";
+        } else {
+            modifyForm.style.display = "none";
+            content.style.display = "block";
+        }
+    }
+</script>
+{% endblock %}

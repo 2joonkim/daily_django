@@ -1,163 +1,130 @@
 {% extends 'todo/base.html' %}
 {% block content %}
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 20px;
-    }
-    .container {
-        max-width: 600px;
-        margin: auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-        text-align: center;
-        color: #333;
-    }
-    ul {
-        list-style-type: none;
-        padding: 0;
-    }
-    li {
-        padding: 10px;
-        margin: 5px 0;
-        background: #eaeaea;
-        border-radius: 5px;
-        transition: background 0.3s;
-    }
-    li:hover {
-        background: #d4d4d4;
-    }
-    a {
-        text-decoration: none;
-        color: #333;
-    }
-    /* 버튼 스타일 */
-    .create-button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        margin-top: 20px;
-        padding: 10px 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        width: 20%;
-        height: 20%;
-        font-size: 16px;
-    }
-
-    .create-button:hover {
-        background-color: #0056b3;
-    }
-    /* 페이지네이션 스타일 */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-    }
-    .pagination a, .pagination span {
-        color: #007bff;
-        padding: 8px 16px;
-        text-decoration: none;
-        transition: background-color .3s;
-    }
-    .pagination p {
-        color: gray;
-        padding: 8px 16px;
-        text-decoration: none;
-        transition: background-color .3s;
-        margin: 0;
-    }
-    .pagination p:hover {
-        background-color: #ddd;
-        border-radius: 5px;
-        cursor: not-allowed;
-    }
-    .pagination a.active {
-        background-color: #007bff;
-        color: white;
-        border-radius: 5px;
-    }
-    .pagination a:hover:not(.active) {
-        background-color: #ddd;
-        border-radius: 5px;
-    }
-    /* 입력 필드 스타일 */
-    input[type="text"] {
-        width: 50%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        margin-bottom: 15px;
-    }
-    /* 버튼 스타일 */
-    .search-button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .search-button:hover {
-        background-color: #0056b3;
-    }
-</style>
-<div class="container" style="margin-top: 15px">
-    {% if request.user.is_authenticated %}
-    <div style="display: flex; justify-content: space-between">
-            {% if not request.user.is_staff %}
-                <h1>{{ request.user.username }}'s Todo List</h1>
-            {% else %}
-                <h1>All To Do List (By. Admin)</h1>
-            {% endif %}
-        <button class="create-button" onclick="location.href='{% url 'todo_create' %}'">생성하기</button>
-    </div>
-    <form method="GET" style="margin: 10px">
-        <input type="text" placeholder="제목 또는 내용을 입력하세요." name="q" value="{% if request.GET.q %}{{ request.GET.q }}{% endif %}">
-        <button class="search-button">Search</button>
-    </form>
-    <ul>
-        {% for todo in page_obj.object_list %}
-            <li><a href="{% url 'todo_info' todo.id %}">{{ todo.title }}</a></li>
-        {% endfor %}
-    </ul>
-    <!-- 페이지네이션 -->
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; First</a>
-            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        {% else %}
-            <p>&laquo; First</p>
-            <p>Previous</p>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-            {% if num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
-                {% if num == page_obj.number %}
-                    <span class="active" style="border-radius: 4px; background-color: #fff122">{{ num }}</span>
+{% if request.user.is_authenticated %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                {% if not request.user.is_staff %}
+                    <h2 class="text-primary mb-1">
+                        <i class="bi bi-list-task me-2"></i>{{ request.user.username }}님의 할 일 목록
+                    </h2>
                 {% else %}
-                    <a href="?page={{ num }}">{{ num }}</a>
+                    <h2 class="text-primary mb-1">
+                        <i class="bi bi-shield-check me-2"></i>전체 할 일 목록 (관리자)
+                    </h2>
                 {% endif %}
-            {% endif %}
-        {% endfor %}
+                <p class="text-muted mb-0">효율적으로 할 일을 관리해보세요</p>
+            </div>
+            <a href="{% url 'cbv_todo_create' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>새 할 일 추가
+            </a>
+        </div>
 
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        <!-- Search -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" placeholder="제목 또는 내용을 검색하세요..." name="q"
+                            value="{% if request.GET.q %}{{ request.GET.q }}{% endif %}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search me-1"></i>검색
+                        </button>
+                        {% if request.GET.q %}
+                        <a href="{% url 'cbv_todo_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>초기화
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Todo List -->
+        {% if page_obj.object_list %}
+            <div class="row">
+                {% for todo in page_obj.object_list %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm hover-shadow">
+                        {% if todo.thumbnail %}
+                            <img src="{{ todo.thumbnail.url }}" class="card-img-top" alt="{{ todo.title }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title text-truncate">
+                                    <i class="bi bi-person-badge me-1"></i>{{ todo.user.username }}
+                                </h6>
+                                <span class="badge {% if todo.is_completed %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                    {% if todo.is_completed %}
+                                        <i class="bi bi-check-circle me-1"></i>완료
+                                    {% else %}
+                                        <i class="bi bi-clock me-1"></i>진행중
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <h5 class="card-title mb-2">{{ todo.title }}</h5>
+                            <p class="card-text text-muted">{{ todo.description|striptags|truncatechars:80 }}</p>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar-range me-1"></i>
+                                    {{ todo.start_date }} ~ {{ todo.end_date }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'cbv_todo_info' todo.id %}" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-eye me-1"></i>자세히 보기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         {% else %}
-            <p>Next</p>
-            <p>Last &raquo;</p>
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                </div>
+                <h4 class="text-muted">등록된 할 일이 없습니다</h4>
+                <p class="text-muted mb-4">첫 번째 할 일을 추가해보세요!</p>
+                <a href="{% url 'cbv_todo_create' %}" class="btn btn-success btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>할 일 추가하기
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if page_obj.object_list %}
+            <div class="d-flex justify-content-center mt-4">
+                {% include 'todo/pagination.html' %}
+            </div>
         {% endif %}
     </div>
-    {% endif %}
 </div>
 
+<style>
+.hover-shadow {
+    transition: box-shadow 0.3s ease;
+}
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
+{% else %}
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="bi bi-person-x display-1 text-muted"></i>
+    </div>
+    <h4 class="text-muted">로그인이 필요합니다</h4>
+    <p class="text-muted mb-4">할 일을 관리하려면 먼저 로그인해주세요.</p>
+    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+        <i class="bi bi-box-arrow-in-right me-2"></i>로그인하기
+    </a>
+</div>
+{% endif %}
 {% endblock %}

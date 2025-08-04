@@ -1,0 +1,56 @@
+{% extends 'registration/base.html' %}
+
+{% block title %}인증 실패 - Todo App{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white text-center py-4">
+                    <div class="mb-3">
+                        <i class="bi bi-x-circle-fill display-1"></i>
+                    </div>
+                    <h2 class="mb-0">인증 실패</h2>
+                </div>
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <h4 class="text-danger mb-3">
+                            <i class="bi bi-exclamation-triangle me-2"></i>이메일 인증에 실패했습니다
+                        </h4>
+                        <p class="text-muted mb-4">
+                            인증 링크가 만료되었거나 올바르지 않습니다.<br>
+                            다시 회원가입을 진행해주세요.
+                        </p>
+                    </div>
+
+                    <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                        <i class="bi bi-clock-fill me-2"></i>
+                        <div>
+                            <strong>안내:</strong> 인증 링크는 발송 후 5분간만 유효합니다.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">다음 중 하나를 선택해주세요:</h6>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'cbv_signup' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus me-2"></i>다시 회원가입
+                            </a>
+                            <a href="{% url 'cbv_login' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>로그인 페이지로
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-question-circle me-1"></i>
+                        문제가 지속되면 관리자에게 문의해주세요.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

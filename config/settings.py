@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import json
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-68#893s6dp1v35sw%s4l09tjrqf7-3pl@0b(x1=r+jqvpuzftj'
+# 환경변수 지정 및 경로 지정
+with open(BASE_DIR/'.secret_config'/'secret.json','r') as f:
+    config_secret_str = f.read()
+
+SECRET = json.loads(config_secret_str)
+SECRET_KEY = SECRET.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+#auth
+AUTH_USER_MODEL = 'users.User'
 ALLOWED_HOSTS = []
+
+# Gmail SMTP 설정 (현재 인증 문제로 주석 처리)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = SECRET['EMAIL']['USER']
+# EMAIL_HOST_PASSWORD = SECRET['EMAIL']['PASSWORD']
+# EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# 콘솔 백엔드 (개발용) - 터미널에 이메일 내용 출력
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@todoapp.com'
 
 
 # Application definition
@@ -40,6 +61,8 @@ INSTALLED_APPS = [
     'todo',
     'users',
     'django_extensions',
+    'django_cleanup',
+    'django_summernote',
 ]
 
 MIDDLEWARE = [
@@ -119,10 +142,85 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+# 미디어 파일에 접근할 때 사용할 URL
+MEDIA_ROOT = BASE_DIR / 'media'    # 미디어 파일을 저장할 디렉토리
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/cbv/todo'
-LOGOUT_REDIRECT_URL = '/todo/'
+LOGOUT_REDIRECT_URL = '/cbv/todo/'
+
+# 개발 환경에서 에러 메시지 더 잘 보이게 하기
+if DEBUG:
+    # 개발 환경에서 깔끔한 로그 출력
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'root': {
+            'level': 'INFO',
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'WARNING',  # SQL 쿼리 숨기기
+                'handlers': ['console'],
+                'propagate': False,
+            },
+        },
+    }
+    
+    # 템플릿 에러 더 자세히 보기
+    TEMPLATES[0]['OPTIONS']['debug'] = True
+
+# Summernote 설정
+SUMMERNOTE_CONFIG = {
+    # HTML 태그 또는 JS를 수정하지 못하도록 iframe 설정
+    'iframe': True,
+
+    'summernote': {
+        # airMode 비활성화: 툴바를 항상 표시하도록 설정
+        'airMode': False,
+
+        # 에디터의 사이즈 정의
+        'width': '100%',    # 에디터의 너비를 100%로 설정
+        'height': '480',    # 에디터의 높이를 480px로 설정
+
+        # 에디터의 툴바 메뉴 정의
+        'toolbar': [
+            ['style', ['style']],                      # 스타일 설정
+            ['font', ['bold', 'underline', 'clear']],  # 글꼴 설정: 굵게, 밑줄, 지우기
+            ['color', ['color']],                      # 색상 설정
+            ['para', ['ul', 'ol', 'paragraph']],       # 문단 설정: 글머리 기호, 번호 매기기, 문단
+            ['table', ['table']],                      # 표 삽입
+            ['insert', ['link', 'picture']],           # 삽입 기능: 링크, 그림
+            ['view', ['fullscreen']],                  # 보기 설정: 전체 화면
+        ],
+
+        # 에디터 언어 정의
+        'lang': 'ko-KR',  # 에디터의 언어를 한국어로 설정
+
+        # 코드미러 설정
+        'codemirror': {
+            'mode': 'htmlmixed',     # 코드미러의 모드를 htmlmixed로 설정
+            'lineNumbers': 'true',   # 코드미러에서 줄 번호를 표시
+            'theme': 'monokai',      # 코드미러의 테마를 monokai로 설정
+        },
+    },
+
+    # 첨부파일 인증 필요 여부 설정
+    'attachment_require_authentication': True,
+
+    # 첨부파일 기능 비활성화 설정
+    'disable_attachment': False,
+
+    # 첨부파일의 절대경로 URI 사용 설정
+    'attachment_absolute_uri': True,
+}

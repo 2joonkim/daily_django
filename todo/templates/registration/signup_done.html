@@ -1,0 +1,55 @@
+{% extends 'registration/base.html' %}
+
+{% block title %}이메일 인증 - Todo App{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-info text-white text-center py-4">
+                    <div class="mb-3">
+                        <i class="bi bi-envelope-check-fill display-1"></i>
+                    </div>
+                    <h2 class="mb-0">이메일 인증 필요</h2>
+                </div>
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <h4 class="text-success mb-3">
+                            <i class="bi bi-check-circle me-2"></i>회원가입이 거의 완료되었습니다!
+                        </h4>
+                        <p class="text-muted mb-4">
+                            회원가입 시 입력하신 이메일 주소로 인증 링크를 발송했습니다.<br>
+                            이메일을 확인하고 인증 링크를 클릭해주세요.
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div>
+                            <strong>중요:</strong> 이메일 인증을 완료하지 않으면 로그인할 수 없습니다.
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'cbv_login' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>로그인 페이지로
+                            </a>
+                            <a href="{% url 'cbv_signup' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>회원가입으로 돌아가기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        이메일이 도착하지 않았다면 스팸 폴더를 확인해주세요.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
