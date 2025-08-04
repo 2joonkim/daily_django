@@ -1,160 +1,32 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입 - Todo App</title>
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center py-4">
-        <div class="row w-100 justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow-lg border-0">
-                    <div class="card-header bg-success text-white text-center py-4">
-                        <div class="mb-2">
-                            <i class="bi bi-person-plus-fill display-4"></i>
-                        </div>
-                        <h2 class="mb-0">회원가입</h2>
-                        <p class="mb-0 opacity-75">Todo App에 가입하여 시작하세요</p>
-                    </div>
-                    <div class="card-body p-4">
-                        <form method="POST">
-                            {% csrf_token %}
-                            
-                            <!-- Username Field -->
-                            <div class="mb-3">
-                                <label for="{{ form.username.id_for_label }}" class="form-label">
-                                    <i class="bi bi-person me-1"></i>사용자명 <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-person"></i>
-                                    </span>
-                                    {{ form.username }}
-                                </div>
-                                {% if form.username.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.username.errors %}
-                                            <div>{{ error }}</div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                                {% if form.username.help_text %}
-                                    <div class="form-text">{{ form.username.help_text }}</div>
-                                {% endif %}
-                            </div>
+<!-- registration / signup.html -->
 
-                            <!-- Email Field (if exists) -->
-                            {% if form.email %}
-                            <div class="mb-3">
-                                <label for="{{ form.email.id_for_label }}" class="form-label">
-                                    <i class="bi bi-envelope me-1"></i>이메일
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-envelope"></i>
-                                    </span>
-                                    {{ form.email }}
-                                </div>
-                                {% if form.email.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.email.errors %}
-                                            <div>{{ error }}</div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-
-                            <!-- Password1 Field -->
-                            <div class="mb-3">
-                                <label for="{{ form.password1.id_for_label }}" class="form-label">
-                                    <i class="bi bi-lock me-1"></i>비밀번호 <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-lock"></i>
-                                    </span>
-                                    {{ form.password1 }}
-                                </div>
-                                {% if form.password1.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.password1.errors %}
-                                            <div>{{ error }}</div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                                {% if form.password1.help_text %}
-                                    <div class="form-text">{{ form.password1.help_text }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Password2 Field -->
-                            <div class="mb-4">
-                                <label for="{{ form.password2.id_for_label }}" class="form-label">
-                                    <i class="bi bi-lock-fill me-1"></i>비밀번호 확인 <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-lock-fill"></i>
-                                    </span>
-                                    {{ form.password2 }}
-                                </div>
-                                {% if form.password2.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.password2.errors %}
-                                            <div>{{ error }}</div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                                {% if form.password2.help_text %}
-                                    <div class="form-text">{{ form.password2.help_text }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Signup Button -->
-                            <button type="submit" class="btn btn-success w-100 py-2 mb-3">
-                                <i class="bi bi-person-plus me-2"></i>회원가입
-                            </button>
-
-                            <!-- Non-field errors -->
-                            {% if form.non_field_errors %}
-                                <div class="alert alert-danger">
-                                    {% for error in form.non_field_errors %}
-                                        <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </form>
-                    </div>
-                    <div class="card-footer text-center bg-light">
-                        <p class="mb-0 text-muted">
-                            이미 계정이 있으신가요? 
-                            <a href="{% url 'login' %}" class="text-decoration-none">
-                                <i class="bi bi-box-arrow-in-right me-1"></i>로그인
-                            </a>
-                        </p>
-                    </div>
-                </div>
+{% extends 'registration/base.html' %}
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="w-50">
+        <form method="POST">
+            <div class="d-flex justify-content-start">
+                <h1 class="mb-5 text-center">회원가입</h1>
             </div>
-        </div>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group row mb-3">
+                    <label class="form-label col-md-3" for="{{ field.auto_id }}">{{ field.label }}</label>
+                    <div class="col-md-9 mb-2">
+                        {{ field }}
+                    </div>
+                    {% for error in field.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary mt-5 col-4">Sign Up</button>
+            </div>
+        </form>
     </div>
-
-    <!-- Bootstrap JS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <style>
-        .form-control {
-            border-left: none;
-        }
-        .input-group-text {
-            background-color: #f8f9fa;
-            border-right: none;
-        }
-    </style>
-</body>
-</html>
+</div>
+{% endblock %}

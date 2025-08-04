@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import json
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-68#893s6dp1v35sw%s4l09tjrqf7-3pl@0b(x1=r+jqvpuzftj'
+# 환경변수 지정 및 경로 지정
+with open(BASE_DIR/'.secret_config'/'secret.json','r') as f:
+    config_secret_str = f.read()
+
+SECRET = json.loads(config_secret_str)
+SECRET_KEY = SECRET.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+#auth
+AUTH_USER_MODEL = 'users.User'
 ALLOWED_HOSTS = []
+
+# Gmail SMTP 설정 (현재 인증 문제로 주석 처리)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = SECRET['EMAIL']['USER']
+# EMAIL_HOST_PASSWORD = SECRET['EMAIL']['PASSWORD']
+# EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# 콘솔 백엔드 (개발용) - 터미널에 이메일 내용 출력
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@todoapp.com'
 
 
 # Application definition

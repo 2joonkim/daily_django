@@ -7,3 +7,6 @@ __pycache__/
 .venv
 .Vscode/
 .vscode/
+
+#Django
+.secret_config/

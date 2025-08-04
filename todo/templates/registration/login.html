@@ -1,113 +1,35 @@
-<!DOCTYPE html>
-<html lang="ko">
+<!-- registration / login.html -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 - Todo App</title>
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-</head>
-
-<body class="bg-light">
-    <div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
-        <div class="row w-100 justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-lg border-0">
-                    <div class="card-header bg-primary text-white text-center py-4">
-                        <div class="mb-2">
-                            <i class="bi bi-check-circle-fill display-4"></i>
-                        </div>
-                        <h2 class="mb-0">Todo App</h2>
-                        <p class="mb-0 opacity-75">로그인하여 시작하세요</p>
+{% extends 'registration/base.html' %}
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="w-50">
+        <form method="POST">
+            <h2 class="mb-4">Login</h2>
+            {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group row mb-3">
+                    <label class="form-label col-md-2" for="{{ field.auto_id }}">{{ field.label }}</label>
+                    <div class="col-md-10 mb-2">
+                        {{ field }}
                     </div>
-                    <div class="card-body p-4">
-                        <form method="POST">
-                            {% csrf_token %}
-
-                            <!-- Username Field -->
-                            <div class="mb-3">
-                                <label for="{{ form.username.id_for_label }}" class="form-label">
-                                    <i class="bi bi-person me-1"></i>사용자명
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-person"></i>
-                                    </span>
-                                    {{ form.username }}
-                                </div>
-                                {% if form.username.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.username.errors %}
-                                    <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Password Field -->
-                            <div class="mb-4">
-                                <label for="{{ form.password.id_for_label }}" class="form-label">
-                                    <i class="bi bi-lock me-1"></i>비밀번호
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-lock"></i>
-                                    </span>
-                                    {{ form.password }}
-                                </div>
-                                {% if form.password.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.password.errors %}
-                                    <div>{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Login Button -->
-                            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>로그인
-                            </button>
-
-                            <!-- Non-field errors -->
-                            {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                <div>{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </form>
-                    </div>
-                    <div class="card-footer text-center bg-light">
-                        <p class="mb-0 text-muted">
-                            아직 회원이 아니신가요?
-                            <a href="{% url 'signup' %}" class="text-decoration-none">
-                                <i class="bi bi-person-plus me-1"></i>회원가입
-                            </a>
-                        </p>
-                    </div>
+                    {% for error in field.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
                 </div>
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Login</button>
             </div>
-        </div>
+            <p>
+                아직 회원이 아니라면 회원가입을 진행해주세요.
+                <a href='{% url 'cbv_signup' %}'>회원가입</a>
+            </p>
+        </form>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Bootstrap JS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <style>
-        .form-control {
-            border-left: none;
-        }
-
-        .input-group-text {
-            background-color: #f8f9fa;
-            border-right: none;
-        }
-    </style>
-</body>
-
-</html>

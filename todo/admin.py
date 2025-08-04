@@ -17,7 +17,7 @@ class TodoAdmin(admin.ModelAdmin):
     list_display_links = ('title',)
     fieldsets = (
         ('Todo Info', {
-            'fields': ('user', 'title', 'description', 'completed_image', 'is_completed')
+            'fields': ('user', 'title', 'description', 'thumbnail', 'is_completed')
         }),
         ('Date Range', {
             'fields': ('start_date', 'end_date')
